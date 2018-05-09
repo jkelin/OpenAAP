@@ -1,8 +1,0 @@
-version: '3'
-
-services:
-  openaap:
-    image: openaap
-    build:
-      context: .
-      dockerfile: OpenAAP/Dockerfile
