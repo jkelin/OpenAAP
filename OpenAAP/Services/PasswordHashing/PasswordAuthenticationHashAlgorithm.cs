@@ -12,12 +12,12 @@ namespace OpenAAP.Services.PasswordHashing
         SHA1,
 
         /// <summary>
-        /// Scrypt algorithm
+        /// PBKDF2 algorithm
         /// USE THIS IN PRODUCTION
         /// </summary>
         /// <code>
-        /// Scrypt(concat(password, salt), output_size: 64, N: 16384, r: 8, p: 1)
+        /// PBKDF2(password, salt, HMACSHA256, iterationCount: 65536, outputLength: 32)
         /// </code>
-        Scrypt
+        PBKDF2
     }
 }

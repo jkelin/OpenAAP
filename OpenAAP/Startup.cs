@@ -36,6 +36,7 @@ namespace OpenAAP
             services.AddSingleton<ISessionStorageService, InMemorySessionStorageService>();
             services.AddSingleton<PasswordHashingService, PasswordHashingService>();
             services.AddSingleton<SHA1PasswordHashingService, SHA1PasswordHashingService>();
+            services.AddSingleton<PBKDF2PasswordHashingService, PBKDF2PasswordHashingService>();
 
             services.AddDbContext<OpenAAPContext>(opt => opt.UseInMemoryDatabase("OpenAPP"));
             services.AddMvc(options =>
