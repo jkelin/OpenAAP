@@ -32,9 +32,9 @@ namespace Test
             response.EnsureSuccessStatusCode();
 
             var responseString = await response.Content.ReadAsStringAsync();
-            var responseJson = JsonConvert.DeserializeObject<IdentityModel>(responseString);
+            var responseJson = JsonConvert.DeserializeObject<OpenAAP.Context.Identity>(responseString);
 
-            responseJson.ShouldDeepEqual(Seeder.IdentitySingle);
+            response.WithDeepEqual(Seeder.IdentitySingle).IgnoreUnmatchedProperties().Assert();
         }
 
         [Fact]
@@ -54,7 +54,7 @@ namespace Test
                 UserName = "sdfsdfsdf",
             };
 
-            var response = await _client.PostJsonAsync<IdentityModel>($"/identity", create);
+            var response = await _client.PostJsonAsync<OpenAAP.Context.Identity>($"/identity", create);
 
             response.WithDeepEqual(create).IgnoreUnmatchedProperties().Assert();
         }
@@ -69,10 +69,10 @@ namespace Test
                 UserName = "sdfsdfsdf",
             };
 
-            var createResponse = await _client.PostJsonAsync<IdentityModel>($"/identity", create);
+            var createResponse = await _client.PostJsonAsync<OpenAAP.Context.Identity>($"/identity", create);
             createResponse.WithDeepEqual(create).IgnoreUnmatchedProperties().Assert();
 
-            var getResponse = await _client.GetJsonAsync<IdentityModel>($"/identity/{createResponse.Id}");
+            var getResponse = await _client.GetJsonAsync<OpenAAP.Context.Identity>($"/identity/{createResponse.Id}");
             getResponse.WithDeepEqual(create).IgnoreUnmatchedProperties().Assert();
             getResponse.WithDeepEqual(createResponse).IgnoreUnmatchedProperties().Assert();
         }
@@ -87,10 +87,10 @@ namespace Test
                 UserName = "sdfsdfsdf",
             };
 
-            var createResponse = await _client.PostJsonAsync<IdentityModel>($"/identity", create);
+            var createResponse = await _client.PostJsonAsync<OpenAAP.Context.Identity>($"/identity", create);
             createResponse.WithDeepEqual(create).IgnoreUnmatchedProperties().Assert();
 
-            var getResponse = await _client.GetJsonAsync<IdentityModel>($"/identity/{createResponse.Id}");
+            var getResponse = await _client.GetJsonAsync<OpenAAP.Context.Identity>($"/identity/{createResponse.Id}");
             getResponse.WithDeepEqual(create).IgnoreUnmatchedProperties().Assert();
             getResponse.WithDeepEqual(createResponse).IgnoreUnmatchedProperties().Assert();
 
@@ -112,10 +112,10 @@ namespace Test
                 UserName = "sdfsdfsdf",
             };
 
-            var createResponse = await _client.PostJsonAsync<IdentityModel>($"/identity", create);
+            var createResponse = await _client.PostJsonAsync<OpenAAP.Context.Identity>($"/identity", create);
             createResponse.WithDeepEqual(create).IgnoreUnmatchedProperties().Assert();
 
-            var getResponse = await _client.GetJsonAsync<IdentityModel>($"/identity/{createResponse.Id}");
+            var getResponse = await _client.GetJsonAsync<OpenAAP.Context.Identity>($"/identity/{createResponse.Id}");
             getResponse.WithDeepEqual(create).IgnoreUnmatchedProperties().Assert();
             getResponse.WithDeepEqual(createResponse).IgnoreUnmatchedProperties().Assert();
 
@@ -125,12 +125,12 @@ namespace Test
                 UserName = "023164654",
             };
 
-            var putResponse = await _client.PutJsonAsync<IdentityModel>($"/identity/{createResponse.Id}", update);
+            var putResponse = await _client.PutJsonAsync<OpenAAP.Context.Identity>($"/identity/{createResponse.Id}", update);
             Assert.Equal(putResponse.Description, update.Description);
             Assert.Equal(putResponse.UserName, update.UserName);
             Assert.Equal(putResponse.Email, null);
 
-            var getResponse2 = await _client.GetJsonAsync<IdentityModel>($"/identity/{createResponse.Id}");
+            var getResponse2 = await _client.GetJsonAsync<OpenAAP.Context.Identity>($"/identity/{createResponse.Id}");
             getResponse2.WithDeepEqual(putResponse).IgnoreUnmatchedProperties().Assert();
         }
     }

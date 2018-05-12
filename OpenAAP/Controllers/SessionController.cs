@@ -25,7 +25,7 @@ namespace OpenAAP.Controllers
         }
 
         [HttpGet("{sessionId}")]
-        [ProducesResponseType(200, Type = typeof(SessionModel))]
+        [ProducesResponseType(200, Type = typeof(Session))]
         [ProducesResponseType(401)]
         public async Task<IActionResult> GetSession(Guid sessionId)
         {

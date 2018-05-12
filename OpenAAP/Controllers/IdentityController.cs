@@ -33,7 +33,7 @@ namespace OpenAAP.Controllers
         }
 
         [HttpGet("{id}")]
-        [ProducesResponseType(200, Type = typeof(IdentityModel))]
+        [ProducesResponseType(200, Type = typeof(Identity))]
         [ProducesResponseType(404, Type = typeof(IdentityNotFound))]
         public async Task<IActionResult> GetById(Guid id)
         {
@@ -48,10 +48,10 @@ namespace OpenAAP.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(200, Type = typeof(IdentityModel))]
+        [ProducesResponseType(200, Type = typeof(Identity))]
         public async Task<IActionResult> Create([FromBody]CreateIdentityRequest create)
         {
-            var identity = new IdentityModel
+            var identity = new Identity
             {
                 Description = create.Description,
                 Email = create.Email,
@@ -66,7 +66,7 @@ namespace OpenAAP.Controllers
         }
 
         [HttpPut("{id}")]
-        [ProducesResponseType(200, Type = typeof(IdentityModel))]
+        [ProducesResponseType(200, Type = typeof(Identity))]
         [ProducesResponseType(404, Type = typeof(IdentityNotFound))]
         public async Task<IActionResult> Update(Guid id, [FromBody]UpdateIdentityRequest update)
         {

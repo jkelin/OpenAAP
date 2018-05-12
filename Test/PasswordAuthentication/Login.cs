@@ -42,7 +42,7 @@ namespace Test.PasswordAuthentication
         [Fact]
         public async Task TestLogin()
         {
-            var response = await _client.PostJsonAsync<SessionModel>(
+            var response = await _client.PostJsonAsync<OpenAAP.Context.Session>(
                 $"/identity/{Seeder.IdentitySingle.Id}/password/login",
                 new { password = "xyz" }
             );

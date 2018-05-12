@@ -11,7 +11,7 @@ namespace OpenAAP.Services.Session
     public class InMemorySessionStorageService : ISessionStorageService
     {
         private Dictionary<Guid, ISet<Guid>> IdentityIdToSessions = new Dictionary<Guid, ISet<Guid>>();
-        private Dictionary<Guid, SessionModel> SessionIdToSession = new Dictionary<Guid, SessionModel>();
+        private Dictionary<Guid, Context.Session> SessionIdToSession = new Dictionary<Guid, Context.Session>();
         private AsyncReaderWriterLock Lock = new AsyncReaderWriterLock();
         private Queue<(DateTime, Guid)> ExpiringSessions = new Queue<(DateTime, Guid)>();
         private Timer ExpirationClock;
@@ -58,7 +58,7 @@ namespace OpenAAP.Services.Session
             }
         }
 
-        public async Task<SessionModel[]> LookupSessionsByIdentityId(Guid identityId)
+        public async Task<Context.Session[]> LookupSessionsByIdentityId(Guid identityId)
         {
             using (await Lock.ReaderLockAsync())
             {
@@ -68,12 +68,12 @@ namespace OpenAAP.Services.Session
                 }
                 else
                 {
-                    return new SessionModel[0];
+                    return new Context.Session[0];
                 }
             }
         }
 
-        public async Task<SessionModel> LookupSessionBySessionId(Guid sessionId)
+        public async Task<Context.Session> LookupSessionBySessionId(Guid sessionId)
         {
             using (await Lock.ReaderLockAsync())
             {
@@ -81,15 +81,15 @@ namespace OpenAAP.Services.Session
             }
         }
 
-        public async Task StoreSession(SessionModel session)
+        public async Task StoreSession(Context.Session session)
         {
             using (await Lock.WriterLockAsync())
             {
-                SessionIdToSession[session.SessionId] = session;
+                SessionIdToSession[session.Id] = session;
 
                 ISet<Guid> sessions = IdentityIdToSessions.GetValueOrDefault(session.IdentityId) ?? (IdentityIdToSessions[session.IdentityId] = new HashSet<Guid>());
-                sessions.Add(session.SessionId);
-                ExpiringSessions.Enqueue((session.ExpiresAt, session.SessionId));
+                sessions.Add(session.Id);
+                ExpiringSessions.Enqueue((session.ExpiresAt, session.Id));
             }
         }
 
@@ -98,19 +98,12 @@ namespace OpenAAP.Services.Session
         /// </summary>
         public async Task Tick()
         {
-            using (var l = await Lock.UpgradeableReaderLockAsync())
+            using (var l = await Lock.WriterLockAsync())
             {
-                // Check if there is at least one expired session before write locking
-                if(ExpiringSessions.TryPeek(out (DateTime, Guid) x) && x.Item1 < DateTime.UtcNow)
+                // Delete each expired session
+                while (ExpiringSessions.TryPeek(out (DateTime, Guid) y) && y.Item1 < DateTime.UtcNow)
                 {
-                    using (await l.UpgradeAsync())
-                    {
-                        // Delete each expired session
-                        while (ExpiringSessions.TryPeek(out (DateTime, Guid) y) && y.Item1 < DateTime.UtcNow)
-                        {
-                            DeleteSessionInner(ExpiringSessions.Dequeue().Item2);
-                        }
-                    }
+                    DeleteSessionInner(ExpiringSessions.Dequeue().Item2);
                 }
             }
         }
@@ -118,7 +111,7 @@ namespace OpenAAP.Services.Session
         // Write lock needs to be engaged before calling this
         private void DeleteSessionInner(Guid sessionId)
         {
-            if(SessionIdToSession.TryGetValue(sessionId, out SessionModel session))
+            if(SessionIdToSession.TryGetValue(sessionId, out Context.Session session))
             {
                 SessionIdToSession.Remove(sessionId);
 

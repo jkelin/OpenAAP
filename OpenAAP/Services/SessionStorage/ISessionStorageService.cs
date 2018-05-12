@@ -8,11 +8,11 @@ namespace OpenAAP.Services.Session
 {
     public interface ISessionStorageService: IDisposable
     {
-        Task StoreSession(SessionModel session);
+        Task StoreSession(Context.Session session);
 
-        Task<SessionModel> LookupSessionBySessionId(Guid sessionId);
+        Task<Context.Session> LookupSessionBySessionId(Guid sessionId);
 
-        Task<SessionModel[]> LookupSessionsByIdentityId(Guid identityId);
+        Task<Context.Session[]> LookupSessionsByIdentityId(Guid identityId);
 
         Task DeleteSessionByIdentityId(Guid identityId);
 

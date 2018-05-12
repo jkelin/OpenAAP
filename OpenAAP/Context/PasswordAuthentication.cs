@@ -12,8 +12,7 @@ namespace OpenAAP.Context
     /// Represents user's login with password
     /// After password change new row is to be added instead of modification of existing row
     /// </summary>
-    [Table("password_authentication")]
-    public class PasswordAuthenticationModel
+    public class PasswordAuthentication
     {
         [Required]
         public Guid Id { get; set; }
@@ -21,7 +20,7 @@ namespace OpenAAP.Context
         [Required]
         public Guid IdentityId { get; set; }
 
-        public IdentityModel Identity { get; set; }
+        public Identity Identity { get; set; }
 
         [Required]
         public byte[] Hash { get; set; }

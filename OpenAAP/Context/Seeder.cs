@@ -8,7 +8,7 @@ namespace OpenAAP.Context
 {
     public class Seeder
     {
-        public static readonly IdentityModel IdentityNormal = new IdentityModel
+        public static readonly Identity IdentityNormal = new Identity
         {
             Id = Guid.NewGuid(),
             Description = "normal user with one valid and one disabled password auth",
@@ -16,7 +16,7 @@ namespace OpenAAP.Context
             UserName = "normal"
         };
 
-        public static readonly IdentityModel IdentitySingle = new IdentityModel
+        public static readonly Identity IdentitySingle = new Identity
         {
             Id = Guid.NewGuid(),
             Description = "user with just one enable password auth",
@@ -24,7 +24,7 @@ namespace OpenAAP.Context
             UserName = "single"
         };
 
-        public static readonly IdentityModel IdentityNone = new IdentityModel
+        public static readonly Identity IdentityNone = new Identity
         {
             Id = Guid.NewGuid(),
             Description = "user with no passwords",
@@ -32,7 +32,7 @@ namespace OpenAAP.Context
             UserName = "none"
         };
 
-        public static readonly IdentityModel IdentityNone2 = new IdentityModel
+        public static readonly Identity IdentityNone2 = new Identity
         {
             Id = Guid.NewGuid(),
             Description = null,
@@ -40,7 +40,7 @@ namespace OpenAAP.Context
             UserName = "none"
         };
 
-        public static readonly IdentityModel[] Identites = new IdentityModel[]
+        public static readonly Identity[] Identites = new Identity[]
         {
             IdentityNormal,
             IdentitySingle,
@@ -52,7 +52,7 @@ namespace OpenAAP.Context
         /// Password: quick brown fox
         /// Salt: abcd
         /// </summary>
-        public static readonly PasswordAuthenticationModel PWNormal1 = new PasswordAuthenticationModel
+        public static readonly PasswordAuthentication PWNormal1 = new PasswordAuthentication
         {
             Id = Guid.NewGuid(),
             IdentityId = IdentityNormal.Id,
@@ -66,7 +66,7 @@ namespace OpenAAP.Context
         /// Password: 1234567890
         /// Salt: abcd
         /// </summary>
-        public static readonly PasswordAuthenticationModel PWNormal2 = new PasswordAuthenticationModel
+        public static readonly PasswordAuthentication PWNormal2 = new PasswordAuthentication
         {
             Id = Guid.NewGuid(),
             IdentityId = IdentityNormal.Id,
@@ -81,7 +81,7 @@ namespace OpenAAP.Context
         /// Password: xyz
         /// Salt: abcd
         /// </summary>
-        public static readonly PasswordAuthenticationModel PWSingle = new PasswordAuthenticationModel
+        public static readonly PasswordAuthentication PWSingle = new PasswordAuthentication
         {
             Id = Guid.NewGuid(),
             IdentityId = IdentitySingle.Id,
@@ -91,7 +91,7 @@ namespace OpenAAP.Context
             CreatedAt = new DateTime(2009, 7, 25),
         };
 
-        public static readonly PasswordAuthenticationModel[] PasswordAuths = new PasswordAuthenticationModel[]
+        public static readonly PasswordAuthentication[] PasswordAuths = new PasswordAuthentication[]
         {
             PWNormal1,
             PWNormal2,

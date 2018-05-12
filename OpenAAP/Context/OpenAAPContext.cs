@@ -8,9 +8,9 @@ namespace OpenAAP.Context
 {
     public class OpenAAPContext : DbContext
     {
-        public DbSet<IdentityModel> Identity { get; set; }
+        public DbSet<Identity> Identity { get; set; }
 
-        public DbSet<PasswordAuthenticationModel> PasswordAuthentication { get; set; }
+        public DbSet<PasswordAuthentication> PasswordAuthentication { get; set; }
 
         public OpenAAPContext(DbContextOptions<OpenAAPContext> options)
         : base(options)
@@ -19,9 +19,19 @@ namespace OpenAAP.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+        }
 
-            modelBuilder.Entity<IdentityModel>().HasData(Seeder.Identites);
-            modelBuilder.Entity<PasswordAuthenticationModel>().HasData(Seeder.PasswordAuths);
+        public async Task Seed()
+        {
+            if (await Identity.AnyAsync() || await PasswordAuthentication.AnyAsync())
+            {
+                return;
+            }
+
+            await Identity.AddRangeAsync(Seeder.Identites);
+            await PasswordAuthentication.AddRangeAsync(Seeder.PasswordAuths);
+
+            await SaveChangesAsync();
         }
     }
 }

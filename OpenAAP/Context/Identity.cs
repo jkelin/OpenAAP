@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 
 namespace OpenAAP.Context
 {
-    [Table("identity")]
-    public class IdentityModel
+    public class Identity
     {
         [Required]
         public Guid Id { get; set; }
@@ -23,6 +22,6 @@ namespace OpenAAP.Context
         [MaxLength(255)]
         public string UserName { get; set; }
 
-        public List<PasswordAuthenticationModel> PasswordAuthentication { get; set; }
+        public ICollection<PasswordAuthentication> PasswordAuthentication { get; set; } = new List<PasswordAuthentication>();
     }
 }

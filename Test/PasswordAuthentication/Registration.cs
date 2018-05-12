@@ -44,7 +44,7 @@ namespace Test.PasswordAuthentication
                 Password = password
             };
 
-            var regResp = await _client.PostJsonAsync<SessionModel>(
+            var regResp = await _client.PostJsonAsync<OpenAAP.Context.Session>(
                 $"/identity/{Seeder.IdentityNone.Id}/password/register",
                 regData
             );
@@ -54,7 +54,7 @@ namespace Test.PasswordAuthentication
                 Password = password
             };
 
-            var loginResp = await _client.PostJsonAsync<SessionModel>(
+            var loginResp = await _client.PostJsonAsync<OpenAAP.Context.Session>(
                 $"/identity/{Seeder.IdentityNone.Id}/password/login",
                 loginData
             );

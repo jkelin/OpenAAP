@@ -22,8 +22,8 @@ namespace Test.PasswordAuthentication
         private readonly string password1 = "abcd123";
         private readonly string password2 = "jksfdhsdkjf";
 
-        private SessionModel session1;
-        private SessionModel session2;
+        private OpenAAP.Context.Session session1;
+        private OpenAAP.Context.Session session2;
 
         public ReRegistration()
         {
@@ -43,14 +43,14 @@ namespace Test.PasswordAuthentication
             return Task.CompletedTask;
         }
 
-        public async Task<SessionModel> Register(string password)
+        public async Task<OpenAAP.Context.Session> Register(string password)
         {
             var data = new PasswordRegisterRequest
             {
                 Password = password
             };
 
-            return await _client.PostJsonAsync<SessionModel>(
+            return await _client.PostJsonAsync<OpenAAP.Context.Session>(
                 $"/identity/{Seeder.IdentityNone.Id}/password/register",
                 data
             );
@@ -59,7 +59,7 @@ namespace Test.PasswordAuthentication
         [Fact]
         public async Task OldPasswordDoesNotWorkAnymore()
         {
-            var reg = await _client.PostJsonAsync<SessionModel>(
+            var reg = await _client.PostJsonAsync<OpenAAP.Context.Session>(
                 $"/identity/{Seeder.IdentityNone.Id}/password/login",
                 HttpStatusCode.Unauthorized,
                 new PasswordLoginRequest
@@ -72,7 +72,7 @@ namespace Test.PasswordAuthentication
         [Fact]
         public async Task Login()
         {
-            var reg = await _client.PostJsonAsync<SessionModel>(
+            var reg = await _client.PostJsonAsync<OpenAAP.Context.Session>(
                 $"/identity/{Seeder.IdentityNone.Id}/password/login",
                 new PasswordLoginRequest
                 {
@@ -84,8 +84,8 @@ namespace Test.PasswordAuthentication
         [Fact]
         public async Task OldSessionIsExpired()
         {
-            var reg = await _client.GetJsonAsync<SessionModel>(
-                $"/session/{session1.SessionId}",
+            var reg = await _client.GetJsonAsync<OpenAAP.Context.Session>(
+                $"/session/{session1.Id}",
                 HttpStatusCode.Unauthorized
             );
         }
@@ -93,8 +93,8 @@ namespace Test.PasswordAuthentication
         [Fact]
         public async Task NewSessionIsActive()
         {
-            var reg = await _client.GetJsonAsync<SessionModel>(
-                $"/session/{session2.SessionId}"
+            var reg = await _client.GetJsonAsync<OpenAAP.Context.Session>(
+                $"/session/{session2.Id}"
             );
         }
     }

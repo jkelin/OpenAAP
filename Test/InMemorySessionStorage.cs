@@ -17,17 +17,17 @@ namespace Test
         {
             using (var store = new InMemorySessionStorageService())
             {
-                var sessionIn = new SessionModel
+                var sessionIn = new OpenAAP.Context.Session
                 {
                     IdentityId = Guid.NewGuid(),
-                    SessionId = Guid.NewGuid(),
+                    Id = Guid.NewGuid(),
                     ExpiresAt = DateTime.UtcNow.AddSeconds(10),
                 };
 
                 await store.StoreSession(sessionIn);
-                var sessionOut = await store.LookupSessionBySessionId(sessionIn.SessionId);
+                var sessionOut = await store.LookupSessionBySessionId(sessionIn.Id);
 
-                Assert.Equal(sessionIn.SessionId, sessionOut.SessionId);
+                Assert.Equal(sessionIn.Id, sessionOut.Id);
                 Assert.Equal(sessionIn.IdentityId, sessionOut.IdentityId);
                 Assert.Equal(sessionIn.ExpiresAt, sessionOut.ExpiresAt);
             }
@@ -49,10 +49,10 @@ namespace Test
         {
             using (var store = new InMemorySessionStorageService())
             {
-                var sessionIn = new SessionModel
+                var sessionIn = new OpenAAP.Context.Session
                 {
                     IdentityId = Guid.NewGuid(),
-                    SessionId = Guid.NewGuid(),
+                    Id = Guid.NewGuid(),
                     ExpiresAt = DateTime.UtcNow.AddSeconds(10),
                 };
 
@@ -60,19 +60,19 @@ namespace Test
 
                 for (int i = 0; i < 10; i++)
                 {
-                    var sessionInAdditional = new SessionModel
+                    var sessionInAdditional = new OpenAAP.Context.Session
                     {
                         IdentityId = sessionIn.IdentityId,
-                        SessionId = Guid.NewGuid(),
+                        Id = Guid.NewGuid(),
                         ExpiresAt = DateTime.UtcNow.AddSeconds(10),
                     };
 
                     await store.StoreSession(sessionInAdditional);
                 }
 
-                var sessionOut = await store.LookupSessionBySessionId(sessionIn.SessionId);
+                var sessionOut = await store.LookupSessionBySessionId(sessionIn.Id);
 
-                Assert.Equal(sessionIn.SessionId, sessionOut.SessionId);
+                Assert.Equal(sessionIn.Id, sessionOut.Id);
                 Assert.Equal(sessionIn.IdentityId, sessionOut.IdentityId);
                 Assert.Equal(sessionIn.ExpiresAt, sessionOut.ExpiresAt);
             }
@@ -83,10 +83,10 @@ namespace Test
         {
             using (var store = new InMemorySessionStorageService())
             {
-                var sessionIn = new SessionModel
+                var sessionIn = new OpenAAP.Context.Session
                 {
                     IdentityId = Guid.NewGuid(),
-                    SessionId = Guid.NewGuid(),
+                    Id = Guid.NewGuid(),
                     ExpiresAt = DateTime.UtcNow.AddSeconds(10),
                 };
 
@@ -94,19 +94,19 @@ namespace Test
 
                 for (int i = 0; i < 10; i++)
                 {
-                    var sessionInAdditional = new SessionModel
+                    var sessionInAdditional = new OpenAAP.Context.Session
                     {
                         IdentityId = Guid.NewGuid(),
-                        SessionId = Guid.NewGuid(),
+                        Id = Guid.NewGuid(),
                         ExpiresAt = DateTime.UtcNow.AddSeconds(10),
                     };
 
                     await store.StoreSession(sessionInAdditional);
                 }
 
-                var sessionOut = await store.LookupSessionBySessionId(sessionIn.SessionId);
+                var sessionOut = await store.LookupSessionBySessionId(sessionIn.Id);
 
-                Assert.Equal(sessionIn.SessionId, sessionOut.SessionId);
+                Assert.Equal(sessionIn.Id, sessionOut.Id);
                 Assert.Equal(sessionIn.IdentityId, sessionOut.IdentityId);
                 Assert.Equal(sessionIn.ExpiresAt, sessionOut.ExpiresAt);
             }
@@ -117,10 +117,10 @@ namespace Test
         {
             using (var store = new InMemorySessionStorageService())
             {
-                var sessionIn = new SessionModel
+                var sessionIn = new OpenAAP.Context.Session
                 {
                     IdentityId = Guid.NewGuid(),
-                    SessionId = Guid.NewGuid(),
+                    Id = Guid.NewGuid(),
                     ExpiresAt = DateTime.UtcNow.AddSeconds(10),
                 };
 
@@ -128,7 +128,7 @@ namespace Test
                 var sessionsOut = await store.LookupSessionsByIdentityId(sessionIn.IdentityId);
 
                 Assert.Equal(1, sessionsOut.Length);
-                Assert.Equal(sessionIn.SessionId, sessionsOut[0].SessionId);
+                Assert.Equal(sessionIn.Id, sessionsOut[0].Id);
                 Assert.Equal(sessionIn.IdentityId, sessionsOut[0].IdentityId);
                 Assert.Equal(sessionIn.ExpiresAt, sessionsOut[0].ExpiresAt);
             }
@@ -150,15 +150,15 @@ namespace Test
         {
             using (var store = new InMemorySessionStorageService())
             {
-                var sessionsIn = new List<SessionModel>();
+                var sessionsIn = new List<OpenAAP.Context.Session>();
                 var identityId = Guid.NewGuid();
 
                 for (int i = 0; i < 10; i++)
                 {
-                    var sessionIn = new SessionModel
+                    var sessionIn = new OpenAAP.Context.Session
                     {
                         IdentityId = identityId,
-                        SessionId = Guid.NewGuid(),
+                        Id = Guid.NewGuid(),
                         ExpiresAt = DateTime.UtcNow.AddSeconds(10),
                     };
 
@@ -172,7 +172,7 @@ namespace Test
 
                 for (int i = 0; i < 10; i++)
                 {
-                    Assert.Equal(sessionsIn[i].SessionId, sessionsOut[i].SessionId);
+                    Assert.Equal(sessionsIn[i].Id, sessionsOut[i].Id);
                     Assert.Equal(sessionsIn[i].IdentityId, sessionsOut[i].IdentityId);
                     Assert.Equal(sessionsIn[i].ExpiresAt, sessionsOut[i].ExpiresAt);
                 }
@@ -184,16 +184,16 @@ namespace Test
         {
             using (var store = new InMemorySessionStorageService())
             {
-                var sessionIn = new SessionModel
+                var sessionIn = new OpenAAP.Context.Session
                 {
                     IdentityId = Guid.NewGuid(),
-                    SessionId = Guid.NewGuid(),
+                    Id = Guid.NewGuid(),
                     ExpiresAt = DateTime.UtcNow.AddSeconds(10),
                 };
 
                 await store.StoreSession(sessionIn);
-                await store.DeleteSessionBySessionId(sessionIn.SessionId);
-                var sessionOut = await store.LookupSessionBySessionId(sessionIn.SessionId);
+                await store.DeleteSessionBySessionId(sessionIn.Id);
+                var sessionOut = await store.LookupSessionBySessionId(sessionIn.Id);
 
                 Assert.Null(sessionOut);
             }
@@ -213,29 +213,29 @@ namespace Test
         {
             using (var store = new InMemorySessionStorageService())
             {
-                var sessionIn = new SessionModel
+                var sessionIn = new OpenAAP.Context.Session
                 {
                     IdentityId = Guid.NewGuid(),
-                    SessionId = Guid.NewGuid(),
+                    Id = Guid.NewGuid(),
                     ExpiresAt = DateTime.UtcNow.AddSeconds(10),
                 };
                 await store.StoreSession(sessionIn);
 
-                var sessionIn2 = new SessionModel
+                var sessionIn2 = new OpenAAP.Context.Session
                 {
                     IdentityId = sessionIn.IdentityId,
-                    SessionId = Guid.NewGuid(),
+                    Id = Guid.NewGuid(),
                     ExpiresAt = DateTime.UtcNow.AddSeconds(10),
                 };
                 await store.StoreSession(sessionIn2);
 
-                await store.DeleteSessionBySessionId(sessionIn.SessionId);
+                await store.DeleteSessionBySessionId(sessionIn.Id);
 
-                var sessionOut = await store.LookupSessionBySessionId(sessionIn.SessionId);
+                var sessionOut = await store.LookupSessionBySessionId(sessionIn.Id);
                 Assert.Null(sessionOut);
 
-                var sessionOut2 = await store.LookupSessionBySessionId(sessionIn2.SessionId);
-                Assert.Equal(sessionIn2.SessionId, sessionOut2.SessionId);
+                var sessionOut2 = await store.LookupSessionBySessionId(sessionIn2.Id);
+                Assert.Equal(sessionIn2.Id, sessionOut2.Id);
                 Assert.Equal(sessionIn2.IdentityId, sessionOut2.IdentityId);
                 Assert.Equal(sessionIn2.ExpiresAt, sessionOut2.ExpiresAt);
             }
@@ -246,29 +246,29 @@ namespace Test
         {
             using (var store = new InMemorySessionStorageService())
             {
-                var sessionIn = new SessionModel
+                var sessionIn = new OpenAAP.Context.Session
                 {
                     IdentityId = Guid.NewGuid(),
-                    SessionId = Guid.NewGuid(),
+                    Id = Guid.NewGuid(),
                     ExpiresAt = DateTime.UtcNow.AddSeconds(10),
                 };
                 await store.StoreSession(sessionIn);
 
-                var sessionIn2 = new SessionModel
+                var sessionIn2 = new OpenAAP.Context.Session
                 {
                     IdentityId = Guid.NewGuid(),
-                    SessionId = Guid.NewGuid(),
+                    Id = Guid.NewGuid(),
                     ExpiresAt = DateTime.UtcNow.AddSeconds(10),
                 };
                 await store.StoreSession(sessionIn2);
 
-                await store.DeleteSessionBySessionId(sessionIn.SessionId);
+                await store.DeleteSessionBySessionId(sessionIn.Id);
 
-                var sessionOut = await store.LookupSessionBySessionId(sessionIn.SessionId);
+                var sessionOut = await store.LookupSessionBySessionId(sessionIn.Id);
                 Assert.Null(sessionOut);
 
-                var sessionOut2 = await store.LookupSessionBySessionId(sessionIn2.SessionId);
-                Assert.Equal(sessionIn2.SessionId, sessionOut2.SessionId);
+                var sessionOut2 = await store.LookupSessionBySessionId(sessionIn2.Id);
+                Assert.Equal(sessionIn2.Id, sessionOut2.Id);
                 Assert.Equal(sessionIn2.IdentityId, sessionOut2.IdentityId);
                 Assert.Equal(sessionIn2.ExpiresAt, sessionOut2.ExpiresAt);
             }
@@ -279,16 +279,16 @@ namespace Test
         {
             using (var store = new InMemorySessionStorageService())
             {
-                var sessionIn = new SessionModel
+                var sessionIn = new OpenAAP.Context.Session
                 {
                     IdentityId = Guid.NewGuid(),
-                    SessionId = Guid.NewGuid(),
+                    Id = Guid.NewGuid(),
                     ExpiresAt = DateTime.UtcNow.AddSeconds(10),
                 };
 
                 await store.StoreSession(sessionIn);
                 await store.DeleteSessionByIdentityId(sessionIn.IdentityId);
-                var sessionOut = await store.LookupSessionBySessionId(sessionIn.SessionId);
+                var sessionOut = await store.LookupSessionBySessionId(sessionIn.Id);
 
                 Assert.Null(sessionOut);
             }
@@ -308,28 +308,28 @@ namespace Test
         {
             using (var store = new InMemorySessionStorageService())
             {
-                var sessionIn = new SessionModel
+                var sessionIn = new OpenAAP.Context.Session
                 {
                     IdentityId = Guid.NewGuid(),
-                    SessionId = Guid.NewGuid(),
+                    Id = Guid.NewGuid(),
                     ExpiresAt = DateTime.UtcNow.AddSeconds(10),
                 };
                 await store.StoreSession(sessionIn);
 
-                var sessionIn2 = new SessionModel
+                var sessionIn2 = new OpenAAP.Context.Session
                 {
                     IdentityId = sessionIn.IdentityId,
-                    SessionId = Guid.NewGuid(),
+                    Id = Guid.NewGuid(),
                     ExpiresAt = DateTime.UtcNow.AddSeconds(10),
                 };
                 await store.StoreSession(sessionIn2);
 
                 await store.DeleteSessionByIdentityId(sessionIn.IdentityId);
 
-                var sessionOut = await store.LookupSessionBySessionId(sessionIn.SessionId);
+                var sessionOut = await store.LookupSessionBySessionId(sessionIn.Id);
                 Assert.Null(sessionOut);
 
-                var sessionOut2 = await store.LookupSessionBySessionId(sessionIn2.SessionId);
+                var sessionOut2 = await store.LookupSessionBySessionId(sessionIn2.Id);
                 Assert.Null(sessionOut2);
             }
         }
@@ -339,29 +339,29 @@ namespace Test
         {
             using (var store = new InMemorySessionStorageService())
             {
-                var sessionIn = new SessionModel
+                var sessionIn = new OpenAAP.Context.Session
                 {
                     IdentityId = Guid.NewGuid(),
-                    SessionId = Guid.NewGuid(),
+                    Id = Guid.NewGuid(),
                     ExpiresAt = DateTime.UtcNow.AddSeconds(10),
                 };
                 await store.StoreSession(sessionIn);
 
-                var sessionIn2 = new SessionModel
+                var sessionIn2 = new OpenAAP.Context.Session
                 {
                     IdentityId = Guid.NewGuid(),
-                    SessionId = Guid.NewGuid(),
+                    Id = Guid.NewGuid(),
                     ExpiresAt = DateTime.UtcNow.AddSeconds(10),
                 };
                 await store.StoreSession(sessionIn2);
 
                 await store.DeleteSessionByIdentityId(sessionIn.IdentityId);
 
-                var sessionOut = await store.LookupSessionBySessionId(sessionIn.SessionId);
+                var sessionOut = await store.LookupSessionBySessionId(sessionIn.Id);
                 Assert.Null(sessionOut);
 
-                var sessionOut2 = await store.LookupSessionBySessionId(sessionIn2.SessionId);
-                Assert.Equal(sessionIn2.SessionId, sessionOut2.SessionId);
+                var sessionOut2 = await store.LookupSessionBySessionId(sessionIn2.Id);
+                Assert.Equal(sessionIn2.Id, sessionOut2.Id);
                 Assert.Equal(sessionIn2.IdentityId, sessionOut2.IdentityId);
                 Assert.Equal(sessionIn2.ExpiresAt, sessionOut2.ExpiresAt);
             }
@@ -376,10 +376,10 @@ namespace Test
                 for (int i = 0; i < 10; i++)
                 {
                     await store.Tick();
-                    var sessionInWarmup = new SessionModel
+                    var sessionInWarmup = new OpenAAP.Context.Session
                     {
                         IdentityId = Guid.NewGuid(),
-                        SessionId = Guid.NewGuid(),
+                        Id = Guid.NewGuid(),
                         ExpiresAt = DateTime.UtcNow.AddMilliseconds(500),
                     };
 
@@ -387,15 +387,15 @@ namespace Test
                     await Task.Delay(10);
                     await store.Tick();
 
-                    var sessionOutWarmup = await store.LookupSessionBySessionId(sessionInWarmup.SessionId);
+                    var sessionOutWarmup = await store.LookupSessionBySessionId(sessionInWarmup.Id);
                 }
                 // Warmup end
 
 
-                var sessionIn = new SessionModel
+                var sessionIn = new OpenAAP.Context.Session
                 {
                     IdentityId = Guid.NewGuid(),
-                    SessionId = Guid.NewGuid(),
+                    Id = Guid.NewGuid(),
                     ExpiresAt = DateTime.UtcNow.AddMilliseconds(500),
                 };
 
@@ -405,9 +405,9 @@ namespace Test
                 await Task.Delay(100);
                 await store.Tick();
 
-                var sessionOut = await store.LookupSessionBySessionId(sessionIn.SessionId);
+                var sessionOut = await store.LookupSessionBySessionId(sessionIn.Id);
                 Assert.NotNull(sessionOut);
-                Assert.Equal(sessionIn.SessionId, sessionOut.SessionId);
+                Assert.Equal(sessionIn.Id, sessionOut.Id);
                 Assert.Equal(sessionIn.IdentityId, sessionOut.IdentityId);
                 Assert.Equal(sessionIn.ExpiresAt, sessionOut.ExpiresAt);
 
@@ -415,7 +415,7 @@ namespace Test
                 await Task.Delay(600);
                 await store.Tick();
   
-                var sessionOut2 = await store.LookupSessionBySessionId(sessionIn.SessionId);
+                var sessionOut2 = await store.LookupSessionBySessionId(sessionIn.Id);
                 Assert.Null(sessionOut2);
             }
         }

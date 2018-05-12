@@ -36,7 +36,7 @@ namespace Test.PasswordAuthentication
         public async Task CannotLogin()
         {
             // Confirm login works before deletion
-            await _client.PostJsonAsync<SessionModel>(
+            await _client.PostJsonAsync<OpenAAP.Context.Session>(
                 $"/identity/{Seeder.IdentitySingle.Id}/password/login",
                 new PasswordLoginRequest { Password = "xyz" }
             );
@@ -48,7 +48,7 @@ namespace Test.PasswordAuthentication
             deleteResp.EnsureSuccessStatusCode();
 
             // Confirm login does not work after deletion
-            await _client.PostJsonAsync<SessionModel>(
+            await _client.PostJsonAsync<OpenAAP.Context.Session>(
                 $"/identity/{Seeder.IdentitySingle.Id}/password/login",
                 HttpStatusCode.Unauthorized,
                 new PasswordLoginRequest { Password = "xyz" }
@@ -61,14 +61,14 @@ namespace Test.PasswordAuthentication
             var identity = Seeder.IdentityNormal.Id;
 
             // Confirm login works before deletion
-            var oldSession = await _client.PostJsonAsync<SessionModel>(
+            var oldSession = await _client.PostJsonAsync<OpenAAP.Context.Session>(
                 $"/identity/{identity}/password/login",
                 new PasswordLoginRequest { Password = "quick brown fox" }
             );
 
             // Confirm that session works
-            await _client.GetJsonAsync<SessionModel>(
-                $"/session/{oldSession.SessionId}"
+            await _client.GetJsonAsync<OpenAAP.Context.Session>(
+                $"/session/{oldSession.Id}"
             );
 
             // Delete auth
@@ -78,8 +78,8 @@ namespace Test.PasswordAuthentication
             deleteResp.EnsureSuccessStatusCode();
 
             // Session no longer works
-            await _client.GetJsonAsync<SessionModel>(
-                $"/session/{oldSession.SessionId}",
+            await _client.GetJsonAsync<OpenAAP.Context.Session>(
+                $"/session/{oldSession.Id}",
                 HttpStatusCode.Unauthorized
             );
         }

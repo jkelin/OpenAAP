@@ -40,7 +40,7 @@ namespace OpenAAP.Controllers
         }
 
         [HttpPost("login")]
-        [ProducesResponseType(200, Type = typeof(SessionModel))]
+        [ProducesResponseType(200, Type = typeof(Session))]
         [ProducesResponseType(404, Type = typeof(NoPasswordAuthenticationFound))]
         [ProducesResponseType(404, Type = typeof(ActivePasswordAuthenticationNotFound))]
         [ProducesResponseType(401)]
@@ -74,11 +74,11 @@ namespace OpenAAP.Controllers
             return Unauthorized();
         }
 
-        async Task<SessionModel> CreateSession(Guid identityId)
+        async Task<Session> CreateSession(Guid identityId)
         {
-            var session = new SessionModel
+            var session = new Session
             {
-                SessionId = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
                 ExpiresAt = DateTime.UtcNow.AddMilliseconds(sessionOptions.SessionExpirationMs),
                 IdentityId = identityId
             };
@@ -88,7 +88,7 @@ namespace OpenAAP.Controllers
             return session;
         }
 
-        async Task<bool> PasswordMatches(string password, PasswordAuthenticationModel auth)
+        async Task<bool> PasswordMatches(string password, PasswordAuthentication auth)
         {
             var passwordBytes = password.ToBytes();
 
@@ -113,14 +113,14 @@ namespace OpenAAP.Controllers
         }
 
         [HttpPost("register")]
-        [ProducesResponseType(200, Type = typeof(SessionModel))]
+        [ProducesResponseType(200, Type = typeof(Session))]
         public async Task<IActionResult> Register(Guid identityId, [FromBody]PasswordRegisterRequest req)
         {
             var algo = hashingOptions.TargetAlgorithm;
             var salt = await hasher.GenerateSalt(hashingOptions.SaltLength);
             var pwHash = await hasher.Hash(req.Password.ToBytes(), salt, algo);
 
-            var auth = new PasswordAuthenticationModel
+            var auth = new PasswordAuthentication
             {
                 Id = Guid.NewGuid(),
                 CreatedAt = DateTime.UtcNow,

@@ -31,7 +31,7 @@ namespace Test
         [Fact]
         public async Task NotExpired()
         {
-            var login = await _client.PostJsonAsync<SessionModel>(
+            var login = await _client.PostJsonAsync<OpenAAP.Context.Session>(
                 $"/identity/{Seeder.IdentitySingle.Id}/password/login",
                 new PasswordLoginRequest
                 {
@@ -39,11 +39,11 @@ namespace Test
                 }
             );
 
-            var session = await _client.GetJsonAsync<SessionModel>(
-                $"/session/{login.SessionId}"
+            var session = await _client.GetJsonAsync<OpenAAP.Context.Session>(
+                $"/session/{login.Id}"
             );
 
-            Assert.Equal(login.SessionId, session.SessionId);
+            Assert.Equal(login.Id, session.Id);
             Assert.Equal(login.IdentityId, session.IdentityId);
             Assert.Equal(login.IdentityId, Seeder.IdentitySingle.Id);
         }
@@ -51,7 +51,7 @@ namespace Test
         [Fact]
         public async Task Expired()
         {
-            var login = await _client.PostJsonAsync<SessionModel>(
+            var login = await _client.PostJsonAsync<OpenAAP.Context.Session>(
                 $"/identity/{Seeder.IdentitySingle.Id}/password/login",
                 new PasswordLoginRequest
                 {
@@ -61,8 +61,8 @@ namespace Test
 
             await Task.Delay(600);
 
-            var session = await _client.GetJsonAsync<SessionModel>(
-                $"/session/{login.SessionId}",
+            var session = await _client.GetJsonAsync<OpenAAP.Context.Session>(
+                $"/session/{login.Id}",
                 System.Net.HttpStatusCode.Unauthorized
             );
         }
@@ -70,7 +70,7 @@ namespace Test
         [Fact]
         public async Task Multiple()
         {
-            var login = await _client.PostJsonAsync<SessionModel>(
+            var login = await _client.PostJsonAsync<OpenAAP.Context.Session>(
                 $"/identity/{Seeder.IdentitySingle.Id}/password/login",
                 new PasswordLoginRequest
                 {
@@ -78,7 +78,7 @@ namespace Test
                 }
             );
 
-            var login2 = await _client.PostJsonAsync<SessionModel>(
+            var login2 = await _client.PostJsonAsync<OpenAAP.Context.Session>(
                 $"/identity/{Seeder.IdentitySingle.Id}/password/login",
                 new PasswordLoginRequest
                 {
@@ -86,19 +86,19 @@ namespace Test
                 }
             );
 
-            var session = await _client.GetJsonAsync<SessionModel>(
-                $"/session/{login.SessionId}"
+            var session = await _client.GetJsonAsync<OpenAAP.Context.Session>(
+                $"/session/{login.Id}"
             );
 
-            var session2 = await _client.GetJsonAsync<SessionModel>(
-                $"/session/{login2.SessionId}"
+            var session2 = await _client.GetJsonAsync<OpenAAP.Context.Session>(
+                $"/session/{login2.Id}"
             );
 
-            Assert.Equal(login.SessionId, session.SessionId);
+            Assert.Equal(login.Id, session.Id);
             Assert.Equal(login.IdentityId, session.IdentityId);
             Assert.Equal(login.IdentityId, Seeder.IdentitySingle.Id);
 
-            Assert.Equal(login2.SessionId, session2.SessionId);
+            Assert.Equal(login2.Id, session2.Id);
             Assert.Equal(login2.IdentityId, session2.IdentityId);
             Assert.Equal(login2.IdentityId, Seeder.IdentitySingle.Id);
         }

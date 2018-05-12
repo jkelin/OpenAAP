@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace OpenAAP.Context
 {
-    public class SessionModel
+    public class Session
     {
         [Required]
-        public Guid SessionId { get; set; }
+        public Guid Id { get; set; }
 
         [Required]
         public Guid IdentityId { get; set; }
