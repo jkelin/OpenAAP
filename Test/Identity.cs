@@ -9,8 +9,8 @@ using System.Net;
 using OpenAAP.Context;
 using Newtonsoft.Json;
 using System.Text;
-using DeepEqual.Syntax;
 using OpenAAP.Requests;
+using FluentAssertions;
 
 namespace Test
 {
@@ -34,14 +34,17 @@ namespace Test
             var responseString = await response.Content.ReadAsStringAsync();
             var responseJson = JsonConvert.DeserializeObject<OpenAAP.Context.Identity>(responseString);
 
-            response.WithDeepEqual(Seeder.IdentitySingle).IgnoreUnmatchedProperties().Assert();
+            responseJson.Id.Should().Be(Seeder.IdentitySingle.Id);
+            responseJson.UserName.Should().Be(Seeder.IdentitySingle.UserName);
+            responseJson.Email.Should().Be(Seeder.IdentitySingle.Email);
+            responseJson.Description.Should().Be(Seeder.IdentitySingle.Description);
         }
 
         [Fact]
         public async Task GetUnknown()
         {
             var response = await _client.GetAsync($"/identity/{Guid.NewGuid()}");
-            Assert.Equal(response.StatusCode, HttpStatusCode.NotFound);
+            response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [Fact]
@@ -56,7 +59,7 @@ namespace Test
 
             var response = await _client.PostJsonAsync<OpenAAP.Context.Identity>($"/identity", create);
 
-            response.WithDeepEqual(create).IgnoreUnmatchedProperties().Assert();
+            response.Should().BeEquivalentTo(create);
         }
 
         [Fact]
@@ -70,11 +73,11 @@ namespace Test
             };
 
             var createResponse = await _client.PostJsonAsync<OpenAAP.Context.Identity>($"/identity", create);
-            createResponse.WithDeepEqual(create).IgnoreUnmatchedProperties().Assert();
+            createResponse.Should().BeEquivalentTo(create);
 
             var getResponse = await _client.GetJsonAsync<OpenAAP.Context.Identity>($"/identity/{createResponse.Id}");
-            getResponse.WithDeepEqual(create).IgnoreUnmatchedProperties().Assert();
-            getResponse.WithDeepEqual(createResponse).IgnoreUnmatchedProperties().Assert();
+            getResponse.Should().BeEquivalentTo(create);
+            getResponse.Should().BeEquivalentTo(createResponse);
         }
 
         [Fact]
@@ -88,17 +91,17 @@ namespace Test
             };
 
             var createResponse = await _client.PostJsonAsync<OpenAAP.Context.Identity>($"/identity", create);
-            createResponse.WithDeepEqual(create).IgnoreUnmatchedProperties().Assert();
+            createResponse.Should().BeEquivalentTo(create);
 
             var getResponse = await _client.GetJsonAsync<OpenAAP.Context.Identity>($"/identity/{createResponse.Id}");
-            getResponse.WithDeepEqual(create).IgnoreUnmatchedProperties().Assert();
-            getResponse.WithDeepEqual(createResponse).IgnoreUnmatchedProperties().Assert();
+            getResponse.Should().BeEquivalentTo(create);
+            getResponse.Should().BeEquivalentTo(createResponse);
 
             var deleteResponse = await _client.DeleteAsync($"/identity/{createResponse.Id}");
             deleteResponse.EnsureSuccessStatusCode();
 
             var getResponse2 = await _client.GetAsync($"/identity/{createResponse.Id}");
-            Assert.Equal(getResponse2.StatusCode, HttpStatusCode.NotFound);
+            getResponse2.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
 
@@ -113,11 +116,11 @@ namespace Test
             };
 
             var createResponse = await _client.PostJsonAsync<OpenAAP.Context.Identity>($"/identity", create);
-            createResponse.WithDeepEqual(create).IgnoreUnmatchedProperties().Assert();
+            createResponse.Should().BeEquivalentTo(create);
 
             var getResponse = await _client.GetJsonAsync<OpenAAP.Context.Identity>($"/identity/{createResponse.Id}");
-            getResponse.WithDeepEqual(create).IgnoreUnmatchedProperties().Assert();
-            getResponse.WithDeepEqual(createResponse).IgnoreUnmatchedProperties().Assert();
+            getResponse.Should().BeEquivalentTo(create);
+            getResponse.Should().BeEquivalentTo(createResponse);
 
             var update = new UpdateIdentityRequest
             {
@@ -126,12 +129,12 @@ namespace Test
             };
 
             var putResponse = await _client.PutJsonAsync<OpenAAP.Context.Identity>($"/identity/{createResponse.Id}", update);
-            Assert.Equal(putResponse.Description, update.Description);
-            Assert.Equal(putResponse.UserName, update.UserName);
-            Assert.Equal(putResponse.Email, null);
+            putResponse.Description.Should().Be(update.Description);
+            putResponse.UserName.Should().Be(update.UserName);
+            putResponse.Email.Should().Be(null);
 
             var getResponse2 = await _client.GetJsonAsync<OpenAAP.Context.Identity>($"/identity/{createResponse.Id}");
-            getResponse2.WithDeepEqual(putResponse).IgnoreUnmatchedProperties().Assert();
+            getResponse2.Should().BeEquivalentTo(putResponse);
         }
     }
 }

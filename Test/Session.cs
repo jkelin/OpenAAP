@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using OpenAAP;
@@ -43,9 +44,9 @@ namespace Test
                 $"/session/{login.Id}"
             );
 
-            Assert.Equal(login.Id, session.Id);
-            Assert.Equal(login.IdentityId, session.IdentityId);
-            Assert.Equal(login.IdentityId, Seeder.IdentitySingle.Id);
+            login.Id.Should().Be(session.Id);
+            login.IdentityId.Should().Be(session.IdentityId);
+            login.IdentityId.Should().Be(Seeder.IdentitySingle.Id);
         }
 
         [Fact]
@@ -94,13 +95,13 @@ namespace Test
                 $"/session/{login2.Id}"
             );
 
-            Assert.Equal(login.Id, session.Id);
-            Assert.Equal(login.IdentityId, session.IdentityId);
-            Assert.Equal(login.IdentityId, Seeder.IdentitySingle.Id);
+            login.Id.Should().Be(session.Id);
+            login.IdentityId.Should().Be(session.IdentityId);
+            login.IdentityId.Should().Be(Seeder.IdentitySingle.Id);
 
-            Assert.Equal(login2.Id, session2.Id);
-            Assert.Equal(login2.IdentityId, session2.IdentityId);
-            Assert.Equal(login2.IdentityId, Seeder.IdentitySingle.Id);
+            login2.Id.Should().Be(session2.Id);
+            login2.IdentityId.Should().Be(session2.IdentityId);
+            login2.IdentityId.Should().Be(Seeder.IdentitySingle.Id);
         }
     }
 }

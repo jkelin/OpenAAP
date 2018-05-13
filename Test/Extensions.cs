@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -42,7 +43,7 @@ namespace Test
             var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
             var response = await client.PostAsync(url, content);
 
-            Assert.Equal(expectedStatusCode, response.StatusCode);
+            expectedStatusCode.Should().Be(response.StatusCode);
 
             var responseString = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<TOut>(responseString);
@@ -61,7 +62,7 @@ namespace Test
         {
             var response = await client.GetAsync(url);
 
-            Assert.Equal(expectedStatusCode, response.StatusCode);
+            expectedStatusCode.Should().Be(response.StatusCode);
 
             var responseString = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<TOut>(responseString);
@@ -82,7 +83,7 @@ namespace Test
             var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
             var response = await client.PutAsync(url, content);
 
-            Assert.Equal(expectedStatusCode, response.StatusCode);
+            expectedStatusCode.Should().Be(response.StatusCode);
 
             var responseString = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<TOut>(responseString);

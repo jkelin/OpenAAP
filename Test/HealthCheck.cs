@@ -9,6 +9,7 @@ using System.Net;
 using OpenAAP.Requests;
 using Newtonsoft.Json;
 using System.Text;
+using FluentAssertions;
 
 namespace Test
 {
@@ -31,14 +32,14 @@ namespace Test
 
             var responseString = await response.Content.ReadAsStringAsync();
 
-            Assert.Equal("pong", responseString);
+            responseString.Should().Be("pong");
         }
 
         [Fact]
         public async Task Unknown()
         {
             var response = await _client.GetAsync("/health/aslkdfjslkdjf");
-            Assert.Equal(response.StatusCode, HttpStatusCode.NotFound);
+            response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [Theory]
@@ -58,10 +59,10 @@ namespace Test
             };
 
             var response = await _client.PostJsonAsync<ValidatorRequest>("/health/body-validator", data);
-            Assert.Equal(response.RequiredUsername, username);
-            Assert.Equal(response.OptionalEmail, email);
-            Assert.Equal(response.RequiredId1?.ToString(), id1);
-            Assert.Equal(response.OptionalId2?.ToString(), id2);
+            response.RequiredUsername.Should().Be(username);
+            response.OptionalEmail.Should().Be(email);
+            response.RequiredId1?.Should().Be(id1);
+            response.OptionalId2?.Should().Be(id2);
         }
 
         [Theory]
@@ -84,7 +85,7 @@ namespace Test
 
             var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
             var response = await _client.PostAsync("/health/body-validator", content);
-            Assert.Equal(response.StatusCode, HttpStatusCode.BadRequest);
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [Theory]
@@ -96,7 +97,7 @@ namespace Test
         {
             var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
             var response = await _client.PostAsync("/health/body-validator", content);
-            Assert.Equal(response.StatusCode, HttpStatusCode.BadRequest);
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
     }
 }

@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Newtonsoft.Json;
@@ -36,7 +37,7 @@ namespace Test.PasswordAuthentication
                 $"/identity/1d8b44ff-9cb7-42f7-bc3b-5c3d73400ca1/password/login",
                  new StringContent(JsonConvert.SerializeObject(new { password = "sdfsdfsdf" }), Encoding.UTF8, "application/json")
             );
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            HttpStatusCode.NotFound.Should().Be(response.StatusCode);
         }
 
         [Fact]
@@ -47,7 +48,7 @@ namespace Test.PasswordAuthentication
                 new { password = "xyz" }
             );
 
-            Assert.Equal(response.IdentityId, Seeder.IdentitySingle.Id);
+            response.IdentityId.Should().Be(Seeder.IdentitySingle.Id);
         }
 
         [Fact]
@@ -57,7 +58,7 @@ namespace Test.PasswordAuthentication
                 $"/identity/{Seeder.IdentitySingle.Id}/password/login",
                  new StringContent(JsonConvert.SerializeObject(new { password = "sdfsdfsdf" }), Encoding.UTF8, "application/json")
             );
-            Assert.Equal(response.StatusCode, HttpStatusCode.Unauthorized);
+            response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
 
         [Fact]
@@ -67,13 +68,13 @@ namespace Test.PasswordAuthentication
                 $"/identity/{Seeder.IdentityNormal.Id}/password/login",
                  new StringContent(JsonConvert.SerializeObject(new { password = "abcd" }), Encoding.UTF8, "application/json")
             );
-            Assert.Equal(response.StatusCode, HttpStatusCode.Unauthorized);
+            response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
             var response2 = await _client.PostAsync(
                 $"/identity/{Seeder.IdentityNormal.Id}/password/login",
                  new StringContent(JsonConvert.SerializeObject(new { password = "quick brown fox" }), Encoding.UTF8, "application/json")
             );
-            Assert.Equal(response2.StatusCode, HttpStatusCode.OK);
+            response2.StatusCode.Should().Be(HttpStatusCode.OK);
         }
     }
 }
