@@ -1,3 +1,4 @@
+using OpenAAP.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,7 +10,7 @@ namespace OpenAAP.Services.PasswordHashing
 {
     public class SHA1PasswordHashingService : IPasswordHashingService
     {
-        public async Task<byte[]> Hash(byte[] password, byte[] salt, PasswordAuthenticationHashAlgorithm algorithm)
+        public async Task<byte[]> Hash(byte[] password, byte[] salt, TargetHashConfigration options)
         {
             using (var stream = new MemoryStream(password.Length + salt.Length))
             {

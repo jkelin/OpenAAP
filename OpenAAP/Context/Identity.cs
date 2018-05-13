@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -22,7 +23,10 @@ namespace OpenAAP.Context
         [MaxLength(255)]
         public string UserName { get; set; }
 
+        [JsonIgnore]
         public ICollection<PasswordAuthentication> PasswordAuthentications { get; set; } = new List<PasswordAuthentication>();
+
+        [JsonIgnore]
         public ICollection<Session> Sessions { get; set; } = new List<Session>();
     }
 }

@@ -14,11 +14,11 @@ namespace OpenAAP.Services.PasswordHashing
 
         public PasswordHashingService(
             SHA1PasswordHashingService sha1,
-            PBKDF2PasswordHashingService scrypt
+            PBKDF2PasswordHashingService pbkdf2
         )
         {
             this.sha1 = sha1;
-            this.pbkdf2 = scrypt;
+            this.pbkdf2 = pbkdf2;
         }
 
         public Task<byte[]> GenerateSalt(int length)
@@ -32,16 +32,16 @@ namespace OpenAAP.Services.PasswordHashing
             return Task.FromResult(salt);
         }
 
-        public Task<byte[]> Hash(byte[] password, byte[] salt, PasswordAuthenticationHashAlgorithm algo)
+        public Task<byte[]> Hash(byte[] password, byte[] salt, TargetHashConfigration options)
         {
-            switch (algo)
+            switch (options.Algorithm ?? throw new InvalidOperationException($"{nameof(options.Algorithm)} required for hashing passwords"))
             {
-                case PasswordAuthenticationHashAlgorithm.SHA1:
-                    return sha1.Hash(password, salt, algo);
-                case PasswordAuthenticationHashAlgorithm.PBKDF2:
-                    return pbkdf2.Hash(password, salt, algo);
+                case HashingAlgorithm.SHA1:
+                    return sha1.Hash(password, salt, options);
+                case HashingAlgorithm.PBKDF2:
+                    return pbkdf2.Hash(password, salt, options);
                 default:
-                    throw new NotImplementedException($"Hashing algorighm {algo} not yet implemented");
+                    throw new NotImplementedException($"Hashing algorithm {options.Algorithm} not yet implemented");
             }
         }
     }

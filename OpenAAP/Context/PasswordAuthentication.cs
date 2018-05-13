@@ -1,4 +1,7 @@
+using Newtonsoft.Json;
+using OpenAAP.Options;
 using OpenAAP.Services.PasswordHashing;
+using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -22,14 +25,12 @@ namespace OpenAAP.Context
 
         public Identity Identity { get; set; }
 
+        /// <summary>
+        /// This is protobuf encoded StoredPassword class
+        /// </summary>
         [Required]
-        public byte[] Hash { get; set; }
-
-        [Required]
-        public byte[] Salt { get; set; }
-
-        [Required]
-        public PasswordAuthenticationHashAlgorithm Algorithm { get; set; }
+        [JsonIgnore]
+        public byte[] EncodedStoredPassword { get; set; }
 
         [Required]
         public DateTime CreatedAt { get; set; }

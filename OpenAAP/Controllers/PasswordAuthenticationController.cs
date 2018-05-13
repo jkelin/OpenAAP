@@ -7,8 +7,10 @@ using OpenAAP.Options;
 using OpenAAP.Requests;
 using OpenAAP.Services.PasswordHashing;
 using OpenAAP.Services.SessionStorage;
+using ProtoBuf;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -21,8 +23,8 @@ namespace OpenAAP.Controllers
         private readonly OpenAAPContext ctx;
         private readonly SessionService session;
         private readonly PasswordHashingService hasher;
-        private readonly HashingOptions hashingOptions;
-        private readonly SessionOptions sessionOptions;
+        private readonly IOptions<HashingOptions> hashingOptions;
+        private readonly IOptions<SessionOptions> sessionOptions;
 
         public PasswordAuthenticationController(
             OpenAAPContext context,
@@ -35,8 +37,8 @@ namespace OpenAAP.Controllers
             ctx = context;
             this.session = session;
             this.hasher = hasher;
-            this.hashingOptions = hashingOptions.Value;
-            this.sessionOptions = sessionOptions.Value;
+            this.hashingOptions = hashingOptions;
+            this.sessionOptions = sessionOptions;
         }
 
         [HttpPost("login")]
@@ -75,10 +77,12 @@ namespace OpenAAP.Controllers
 
         async Task<bool> PasswordMatches(string password, PasswordAuthentication auth)
         {
+            var data = StoredPassword.Deserialize(auth.EncodedStoredPassword);
+
             var passwordBytes = password.ToBytes();
 
-            var hash = await hasher.Hash(passwordBytes, auth.Salt, auth.Algorithm);
-            if (!auth.Hash.ArrayEquals(hash))
+            var hash = await hasher.Hash(passwordBytes, data.Salt, data.Options);
+            if (!data.Hash.ArrayEquals(hash))
             {
                 return false;
             }
@@ -101,17 +105,13 @@ namespace OpenAAP.Controllers
         [ProducesResponseType(200, Type = typeof(ISession))]
         public async Task<IActionResult> Register(Guid identityId, [FromBody]PasswordRegisterRequest req)
         {
-            var algo = hashingOptions.TargetAlgorithm;
-            var salt = await hasher.GenerateSalt(hashingOptions.SaltLength);
-            var pwHash = await hasher.Hash(req.Password.ToBytes(), salt, algo);
+            var hash = await HashPassword(req.Password);
 
             var auth = new PasswordAuthentication
             {
                 Id = Guid.NewGuid(),
                 CreatedAt = DateTime.UtcNow,
-                Algorithm = algo,
-                Hash = pwHash,
-                Salt = salt,
+                EncodedStoredPassword = hash.Serialize(),
                 IdentityId = identityId,
             };
 
@@ -120,6 +120,15 @@ namespace OpenAAP.Controllers
             await ctx.SaveChangesAsync();
 
             return Ok(await session.CreateSession(identityId));
+        }
+
+        private async Task<StoredPassword> HashPassword(string password)
+        {
+            var target = hashingOptions.Value.Target;
+            var salt = await hasher.GenerateSalt(target.SaltLength.Value);
+            var pwHash = await hasher.Hash(password.ToBytes(), salt, target);
+
+            return StoredPassword.From(pwHash, salt, target);
         }
 
         private async Task DisableRegistration(Guid identityId)

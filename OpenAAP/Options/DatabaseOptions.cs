@@ -13,14 +13,16 @@ namespace OpenAAP.Options
         Postgres,
     }
 
-    public class DBOptions
+    public class DatabaseOptions
     {
-        public DatabaseType? DatabaseType { get; set; } = Options.DatabaseType.InMemory;
+        public const string Section = "Database";
+
+        public DatabaseType? Type { get; set; } = Options.DatabaseType.InMemory;
 
         public string ConnectionStringPostgres { get; set; }
         public string ConnectionStringSqlite { get; set; }
         public string ConnectionStringSqlServer { get; set; }
 
-        public bool? SeedDBWithTestData { get; set; } = false;
+        public bool? SeedWithTestData { get; set; } = false;
     }
 }

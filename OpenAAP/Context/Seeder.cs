@@ -1,3 +1,4 @@
+using OpenAAP.Options;
 using OpenAAP.Services.PasswordHashing;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,13 @@ namespace OpenAAP.Context
 {
     public class Seeder
     {
+        public static readonly TargetHashConfigration SHA1Config = new TargetHashConfigration
+        {
+            Algorithm = HashingAlgorithm.SHA1,
+            SaltLength = 4,
+            PasswordHashBytes = 40
+        };
+
         public static readonly Identity IdentityNormal = new Identity
         {
             Id = Guid.NewGuid(),
@@ -56,9 +64,11 @@ namespace OpenAAP.Context
         {
             Id = Guid.NewGuid(),
             IdentityId = IdentityNormal.Id,
-            Algorithm = PasswordAuthenticationHashAlgorithm.SHA1,
-            Hash = new byte[] { 157, 59, 235, 120, 236, 113, 126, 90, 189, 167, 62, 13, 114, 113, 143, 62, 145, 206, 100, 198 },
-            Salt = new byte[] { 97, 98, 99, 100 },
+            EncodedStoredPassword = StoredPassword.From(
+                hash: new byte[] { 157, 59, 235, 120, 236, 113, 126, 90, 189, 167, 62, 13, 114, 113, 143, 62, 145, 206, 100, 198 },
+                salt: new byte[] { 97, 98, 99, 100 },
+                opts: SHA1Config
+            ).Serialize(),
             CreatedAt = new DateTime(2009, 8, 25),
         };
 
@@ -70,9 +80,11 @@ namespace OpenAAP.Context
         {
             Id = Guid.NewGuid(),
             IdentityId = IdentityNormal.Id,
-            Algorithm = PasswordAuthenticationHashAlgorithm.SHA1,
-            Hash = new byte[] { 76, 202, 24, 149, 73, 206, 42, 36, 32, 185, 253, 25, 62, 157, 47, 185, 165, 166, 133, 8 },
-            Salt = new byte[] { 97, 98, 99, 100 },
+            EncodedStoredPassword = StoredPassword.From(
+                hash: new byte[] { 76, 202, 24, 149, 73, 206, 42, 36, 32, 185, 253, 25, 62, 157, 47, 185, 165, 166, 133, 8 },
+                salt: new byte[] { 97, 98, 99, 100 },
+                opts: SHA1Config
+            ).Serialize(),
             CreatedAt = new DateTime(2009, 7, 25),
             DisabledAt = new DateTime(2009, 8, 25),
         };
@@ -85,9 +97,11 @@ namespace OpenAAP.Context
         {
             Id = Guid.NewGuid(),
             IdentityId = IdentitySingle.Id,
-            Algorithm = PasswordAuthenticationHashAlgorithm.SHA1,
-            Hash = new byte[] { 48, 23, 125, 154, 168, 211, 166, 201, 16, 50, 180, 72, 99, 131, 68, 187, 44, 121, 125, 200 },
-            Salt = new byte[] { 97, 98, 99, 100 },
+            EncodedStoredPassword = StoredPassword.From(
+                hash: new byte[] { 48, 23, 125, 154, 168, 211, 166, 201, 16, 50, 180, 72, 99, 131, 68, 187, 44, 121, 125, 200 },
+                salt: new byte[] { 97, 98, 99, 100 },
+                opts: SHA1Config
+            ).Serialize(),
             CreatedAt = new DateTime(2009, 7, 25),
         };
 

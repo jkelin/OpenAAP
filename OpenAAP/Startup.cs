@@ -32,9 +32,9 @@ namespace OpenAAP
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<HashingOptions>(Configuration);
-            services.Configure<Options.SessionOptions>(Configuration);
-            services.Configure<DBOptions>(Configuration);
+            services.Configure<HashingOptions>(Configuration.GetSection(HashingOptions.Section));
+            services.Configure<Options.SessionOptions>(Configuration.GetSection(Options.SessionOptions.Section));
+            services.Configure<DatabaseOptions>(Configuration.GetSection(DatabaseOptions.Section));
 
             
             services.AddTransient<PasswordHashingService, PasswordHashingService>();
@@ -59,9 +59,9 @@ namespace OpenAAP
 
         void ConfigureDatabase(IServiceCollection services)
         {
-            var opts = Configuration.Get<DBOptions>();
+            var opts = Configuration.GetSection(DatabaseOptions.Section).Get<DatabaseOptions>();
 
-            switch (opts.DatabaseType)
+            switch (opts.Type)
             {
                 case DatabaseType.InMemory:
                     services.AddDbContext<OpenAAPContext>(opt => opt.UseInMemoryDatabase("OpenAPP"));
@@ -80,7 +80,7 @@ namespace OpenAAP
 
         void ConfigureSessionStore(IServiceCollection services)
         {
-            var opts = Configuration.Get<Options.SessionOptions>();
+            var opts = Configuration.GetSection(Options.SessionOptions.Section).Get<Options.SessionOptions>();
 
             switch (opts.SessionStoreType)
             {
@@ -109,8 +109,9 @@ namespace OpenAAP
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
                 var context = serviceScope.ServiceProvider.GetRequiredService<OpenAAPContext>();
+                var dbOptions = Configuration.GetSection(DatabaseOptions.Section).Get<DatabaseOptions>();
 
-                if (Configuration.Get<DBOptions>().DatabaseType == DatabaseType.InMemory)
+                if (dbOptions.Type == DatabaseType.InMemory)
                 {
                     context.Database.EnsureCreated();
                 }
@@ -119,7 +120,7 @@ namespace OpenAAP
                     context.Database.Migrate();
                 }
 
-                if (Configuration.Get<DBOptions>().SeedDBWithTestData ?? false)
+                if (dbOptions.SeedWithTestData ?? false)
                 {
                     context.Seed().Wait();
                 }

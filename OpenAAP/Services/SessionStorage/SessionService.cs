@@ -39,7 +39,7 @@ namespace OpenAAP.Services.SessionStorage
             var session = new Session
             {
                 Id = Guid.NewGuid(),
-                ExpiresAt = DateTime.UtcNow.AddMilliseconds(sessionOptions.Value.SessionExpirationMs),
+                ExpiresAt = DateTime.UtcNow.AddMilliseconds(sessionOptions.Value.ExpirationMs),
                 IdentityId = identityId,
                 Data = data
             };
