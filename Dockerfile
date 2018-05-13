@@ -1,13 +1,20 @@
-FROM microsoft/dotnet:2.1-sdk-alpine AS build
+FROM microsoft/aspnetcore:2.0 AS base
+WORKDIR /app
+EXPOSE 80
+
+FROM microsoft/aspnetcore-build:2.0 AS build
 WORKDIR /src
-COPY OpenAAP/OpenAAP.csproj /src/
-RUN dotnet restore
-COPY OpenAAP/* /src/
+COPY OpenAAP.sln ./
+COPY OpenAAP/OpenAAP.csproj OpenAAP/
+RUN dotnet restore -nowarn:msb3202,nu1503
+COPY . .
+WORKDIR /src/OpenAAP
+RUN dotnet build -c Release -o /app
+
+FROM build AS publish
 RUN dotnet publish -c Release -o /app
 
-
-FROM microsoft/dotnet:2.1-aspnetcore-runtime-alpine AS runtime
-EXPOSE 80
+FROM base AS final
 WORKDIR /app
-COPY --from=build /app /app
+COPY --from=publish /app .
 ENTRYPOINT ["dotnet", "OpenAAP.dll"]

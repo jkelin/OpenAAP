@@ -59,7 +59,7 @@ namespace OpenAAP
 
         void ConfigureDatabase(IServiceCollection services)
         {
-            var opts = Configuration.GetSection(DatabaseOptions.Section).Get<DatabaseOptions>();
+            var opts = Configuration.GetSection(DatabaseOptions.Section).Get<DatabaseOptions>() ?? new DatabaseOptions();
 
             switch (opts.Type)
             {
@@ -80,7 +80,7 @@ namespace OpenAAP
 
         void ConfigureSessionStore(IServiceCollection services)
         {
-            var opts = Configuration.GetSection(Options.SessionOptions.Section).Get<Options.SessionOptions>();
+            var opts = Configuration.GetSection(Options.SessionOptions.Section).Get<Options.SessionOptions>() ?? new Options.SessionOptions();
 
             switch (opts.SessionStoreType)
             {
@@ -109,7 +109,7 @@ namespace OpenAAP
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
                 var context = serviceScope.ServiceProvider.GetRequiredService<OpenAAPContext>();
-                var dbOptions = Configuration.GetSection(DatabaseOptions.Section).Get<DatabaseOptions>();
+                var dbOptions = Configuration.GetSection(DatabaseOptions.Section).Get<DatabaseOptions>() ?? new DatabaseOptions();
 
                 if (dbOptions.Type == DatabaseType.InMemory)
                 {
