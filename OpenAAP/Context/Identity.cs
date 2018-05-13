@@ -22,6 +22,7 @@ namespace OpenAAP.Context
         [MaxLength(255)]
         public string UserName { get; set; }
 
-        public ICollection<PasswordAuthentication> PasswordAuthentication { get; set; } = new List<PasswordAuthentication>();
+        public ICollection<PasswordAuthentication> PasswordAuthentications { get; set; } = new List<PasswordAuthentication>();
+        public ICollection<Session> Sessions { get; set; } = new List<Session>();
     }
 }

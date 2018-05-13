@@ -14,7 +14,9 @@ using OpenAAP.Context;
 using OpenAAP.Helpers;
 using OpenAAP.Options;
 using OpenAAP.Services.PasswordHashing;
-using OpenAAP.Services.Session;
+using OpenAAP.Services.SessionDataStorage;
+using OpenAAP.Services.SessionStorage;
+using StackExchange.Redis;
 
 namespace OpenAAP
 {
@@ -34,12 +36,14 @@ namespace OpenAAP
             services.Configure<Options.SessionOptions>(Configuration);
             services.Configure<DBOptions>(Configuration);
 
-            services.AddSingleton<ISessionStorageService, InMemorySessionStorageService>();
-            services.AddSingleton<PasswordHashingService, PasswordHashingService>();
-            services.AddSingleton<SHA1PasswordHashingService, SHA1PasswordHashingService>();
-            services.AddSingleton<PBKDF2PasswordHashingService, PBKDF2PasswordHashingService>();
+            
+            services.AddTransient<PasswordHashingService, PasswordHashingService>();
+            services.AddTransient<SHA1PasswordHashingService, SHA1PasswordHashingService>();
+            services.AddTransient<PBKDF2PasswordHashingService, PBKDF2PasswordHashingService>();
+            services.AddTransient<SessionService, SessionService>();
 
             ConfigureDatabase(services);
+            ConfigureSessionStore(services);
 
             services.AddMvc(options =>
             {
@@ -57,7 +61,7 @@ namespace OpenAAP
         {
             var opts = Configuration.Get<DBOptions>();
 
-            switch (opts.DatabaseType ?? DatabaseType.InMemory)
+            switch (opts.DatabaseType)
             {
                 case DatabaseType.InMemory:
                     services.AddDbContext<OpenAAPContext>(opt => opt.UseInMemoryDatabase("OpenAPP"));
@@ -70,6 +74,24 @@ namespace OpenAAP
                     break;
                 case DatabaseType.Postgres:
                     services.AddDbContext<OpenAAPContext>(opt => opt.UseNpgsql(opts.ConnectionStringPostgres));
+                    break;
+            }
+        }
+
+        void ConfigureSessionStore(IServiceCollection services)
+        {
+            var opts = Configuration.Get<Options.SessionOptions>();
+
+            switch (opts.SessionStoreType)
+            {
+                case SessionStoreType.InMemory:
+                    services.AddSingleton<ISessionDataStorage, InMemorySessionDataStorageService>();
+                    break;
+                case SessionStoreType.Redis:
+                    var redis = ConnectionMultiplexer.Connect(opts.RedisConnectionString);
+                    services.AddSingleton(_ => redis);
+                    services.AddTransient(_ => redis.GetDatabase());
+                    services.AddTransient<ISessionDataStorage, RedisSessionDataStorageService>();
                     break;
             }
         }

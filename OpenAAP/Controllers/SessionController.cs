@@ -1,7 +1,7 @@
-using Microsoft.AspNetCore.Mvc;
+ using Microsoft.AspNetCore.Mvc;
 using OpenAAP.Context;
 using OpenAAP.Errors;
-using OpenAAP.Services.Session;
+using OpenAAP.Services.SessionStorage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,23 +13,23 @@ namespace OpenAAP.Controllers
     public class SessionController : Controller
     {
         private readonly OpenAAPContext ctx;
-        private readonly ISessionStorageService sessionStorage;
+        private readonly SessionService sessionSvc;
 
         public SessionController(
              OpenAAPContext context,
-             ISessionStorageService sessionStorage
+             SessionService session
         )
         {
             ctx = context;
-            this.sessionStorage = sessionStorage;
+            this.sessionSvc = session;
         }
 
         [HttpGet("{sessionId}")]
-        [ProducesResponseType(200, Type = typeof(Session))]
+        [ProducesResponseType(200, Type = typeof(ISession))]
         [ProducesResponseType(401)]
         public async Task<IActionResult> GetSession(Guid sessionId)
         {
-            var session = await sessionStorage.LookupSessionBySessionId(sessionId);
+            var session = await sessionSvc.LookupBySessionId(sessionId);
             
             if (session != null)
             {
@@ -45,11 +45,11 @@ namespace OpenAAP.Controllers
         [ProducesResponseType(401)]
         public async Task<IActionResult> DeleteSession(Guid sessionId)
         {
-            var session = await sessionStorage.LookupSessionBySessionId(sessionId);
+            var session = await sessionSvc.LookupBySessionId(sessionId);
 
             if (session != null)
             {
-                await sessionStorage.DeleteSessionBySessionId(sessionId);
+                await sessionSvc.DeleteBySessionId(sessionId);
                 return Ok();
             }
             else

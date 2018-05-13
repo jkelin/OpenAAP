@@ -6,7 +6,7 @@ using OpenAAP.Errors;
 using OpenAAP.Options;
 using OpenAAP.Requests;
 using OpenAAP.Services.PasswordHashing;
-using OpenAAP.Services.Session;
+using OpenAAP.Services.SessionStorage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,34 +19,34 @@ namespace OpenAAP.Controllers
     public class PasswordAuthenticationController : Controller
     {
         private readonly OpenAAPContext ctx;
-        private readonly ISessionStorageService sessionStorage;
+        private readonly SessionService session;
         private readonly PasswordHashingService hasher;
         private readonly HashingOptions hashingOptions;
         private readonly SessionOptions sessionOptions;
 
         public PasswordAuthenticationController(
             OpenAAPContext context,
-            ISessionStorageService sessionStorage,
+            SessionService session,
             PasswordHashingService hasher,
             IOptions<HashingOptions> hashingOptions,
             IOptions<SessionOptions> sessionOptions
         )
         {
             ctx = context;
-            this.sessionStorage = sessionStorage;
+            this.session = session;
             this.hasher = hasher;
             this.hashingOptions = hashingOptions.Value;
             this.sessionOptions = sessionOptions.Value;
         }
 
         [HttpPost("login")]
-        [ProducesResponseType(200, Type = typeof(Session))]
+        [ProducesResponseType(200, Type = typeof(ISession))]
         [ProducesResponseType(404, Type = typeof(NoPasswordAuthenticationFound))]
         [ProducesResponseType(404, Type = typeof(ActivePasswordAuthenticationNotFound))]
         [ProducesResponseType(401)]
         public async Task<IActionResult> Login(Guid identityId, [FromBody]PasswordLoginRequest req)
         {
-            var auths = ctx.PasswordAuthentication.Where(x => x.IdentityId == identityId);
+            var auths = ctx.PasswordAuthentications.Where(x => x.IdentityId == identityId);
 
             if (!await auths.AnyAsync())
             {
@@ -64,28 +64,13 @@ namespace OpenAAP.Controllers
             {
                 if (await PasswordMatches(req.Password, auth))
                 {
-                    var session = await CreateSession(identityId);
-                    return Ok(session);
+                    return Ok(await session.CreateSession(identityId));
                 }
             }
 
             // TODO if password matches one of the disabled passwords, return error that says so
 
             return Unauthorized();
-        }
-
-        async Task<Session> CreateSession(Guid identityId)
-        {
-            var session = new Session
-            {
-                Id = Guid.NewGuid(),
-                ExpiresAt = DateTime.UtcNow.AddMilliseconds(sessionOptions.SessionExpirationMs),
-                IdentityId = identityId
-            };
-
-            await sessionStorage.StoreSession(session);
-
-            return session;
         }
 
         async Task<bool> PasswordMatches(string password, PasswordAuthentication auth)
@@ -113,7 +98,7 @@ namespace OpenAAP.Controllers
         }
 
         [HttpPost("register")]
-        [ProducesResponseType(200, Type = typeof(Session))]
+        [ProducesResponseType(200, Type = typeof(ISession))]
         public async Task<IActionResult> Register(Guid identityId, [FromBody]PasswordRegisterRequest req)
         {
             var algo = hashingOptions.TargetAlgorithm;
@@ -131,23 +116,21 @@ namespace OpenAAP.Controllers
             };
 
             await DisableRegistration(identityId);
-            await ctx.PasswordAuthentication.AddAsync(auth);
+            await ctx.PasswordAuthentications.AddAsync(auth);
             await ctx.SaveChangesAsync();
 
-            var session = await CreateSession(identityId);
-
-            return Ok(session);
+            return Ok(await session.CreateSession(identityId));
         }
 
         private async Task DisableRegistration(Guid identityId)
         {
-            var registrations = await ctx.PasswordAuthentication.Where(x => x.IdentityId == identityId && x.DisabledAt == null).ToListAsync();
+            var registrations = await ctx.PasswordAuthentications.Where(x => x.IdentityId == identityId && x.DisabledAt == null).ToListAsync();
             foreach (var reg in registrations)
             {
                 reg.DisabledAt = DateTime.UtcNow;
             }
 
-            await sessionStorage.DeleteSessionByIdentityId(identityId);
+            await session.DeleteSessionsForIdentity(identityId);
         }
     }
 }

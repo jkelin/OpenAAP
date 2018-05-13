@@ -15,12 +15,12 @@ namespace OpenAAP.Options
 
     public class DBOptions
     {
-        public DatabaseType? DatabaseType { get; set; }
+        public DatabaseType? DatabaseType { get; set; } = Options.DatabaseType.InMemory;
 
         public string ConnectionStringPostgres { get; set; }
         public string ConnectionStringSqlite { get; set; }
         public string ConnectionStringSqlServer { get; set; }
 
-        public bool? SeedDBWithTestData { get; set; }
+        public bool? SeedDBWithTestData { get; set; } = false;
     }
 }

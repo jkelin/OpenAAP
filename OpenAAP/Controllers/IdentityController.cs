@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using OpenAAP.Context;
 using OpenAAP.Errors;
 using OpenAAP.Requests;
-using OpenAAP.Services.Session;
+using OpenAAP.Services.SessionStorage;
 
 namespace OpenAAP.Controllers
 {
@@ -15,21 +15,21 @@ namespace OpenAAP.Controllers
     public class IdentityController : Controller
     {
         private readonly OpenAAPContext ctx;
-        private readonly ISessionStorageService sessionStorage;
+        private readonly SessionService session;
 
         public IdentityController(
             OpenAAPContext context,
-            ISessionStorageService sessionStorage
+            SessionService session
         )
         {
             ctx = context;
-            this.sessionStorage = sessionStorage;
+            this.session = session;
         }
 
         [HttpGet("all")]
         public async Task<IActionResult> All()
         {
-            return Ok(await ctx.Identity.ToListAsync());
+            return Ok(await ctx.Identities.ToListAsync());
         }
 
         [HttpGet("{id}")]
@@ -37,7 +37,7 @@ namespace OpenAAP.Controllers
         [ProducesResponseType(404, Type = typeof(IdentityNotFound))]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var identity = await ctx.Identity.FindAsync(id);
+            var identity = await ctx.Identities.FindAsync(id);
 
             if (identity == null)
             {
@@ -58,7 +58,7 @@ namespace OpenAAP.Controllers
                 UserName = create.UserName
             };
 
-            ctx.Identity.Add(identity);
+            ctx.Identities.Add(identity);
 
             await ctx.SaveChangesAsync();
 
@@ -70,7 +70,7 @@ namespace OpenAAP.Controllers
         [ProducesResponseType(404, Type = typeof(IdentityNotFound))]
         public async Task<IActionResult> Update(Guid id, [FromBody]UpdateIdentityRequest update)
         {
-            var identity = await ctx.Identity.FindAsync(id);
+            var identity = await ctx.Identities.FindAsync(id);
 
             if (identity == null)
             {
@@ -91,16 +91,16 @@ namespace OpenAAP.Controllers
         [ProducesResponseType(404, Type = typeof(IdentityNotFound))]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var identity = await ctx.Identity.FindAsync(id);
+            var identity = await ctx.Identities.FindAsync(id);
 
             if (identity == null)
             {
                 return NotFound(new IdentityNotFound());
             }
 
-            await sessionStorage.DeleteSessionByIdentityId(id);
+            await session.DeleteSessionsForIdentity(id);
 
-            ctx.Identity.Remove(identity);
+            ctx.Identities.Remove(identity);
 
             await ctx.SaveChangesAsync();
 
