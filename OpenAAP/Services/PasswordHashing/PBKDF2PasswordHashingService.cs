@@ -17,7 +17,7 @@ namespace OpenAAP.Services.PasswordHashing
                     password: BitConverter.ToString(password),
                     salt: salt,
                     prf: KeyDerivationPrf.HMACSHA256,
-                    iterationCount: 65536,
+                    iterationCount: 1024,
                     numBytesRequested: 32)
             );
         }

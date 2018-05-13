@@ -12,6 +12,6 @@ namespace OpenAAP.Options
 
         public SessionStoreType? SessionStoreType { get; set; } = Options.SessionStoreType.InMemory;
 
-        public string RedisConnectionString { get; set; }
+        public string ConnectionStringRedis { get; set; }
     }
 }

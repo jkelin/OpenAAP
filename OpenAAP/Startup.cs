@@ -88,7 +88,7 @@ namespace OpenAAP
                     services.AddSingleton<ISessionDataStorage, InMemorySessionDataStorageService>();
                     break;
                 case SessionStoreType.Redis:
-                    var redis = ConnectionMultiplexer.Connect(opts.RedisConnectionString);
+                    var redis = ConnectionMultiplexer.Connect(opts.ConnectionStringRedis);
                     services.AddSingleton(_ => redis);
                     services.AddTransient(_ => redis.GetDatabase());
                     services.AddTransient<ISessionDataStorage, RedisSessionDataStorageService>();

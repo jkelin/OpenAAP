@@ -60,7 +60,7 @@ namespace OpenAAP.Controllers
                 return NotFound(new ActivePasswordAuthenticationNotFound());
             }
 
-            foreach (var auth in enabledAuths)
+            foreach (var auth in enabledAuths.ToArray())
             {
                 if (await PasswordMatches(req.Password, auth))
                 {

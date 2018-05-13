@@ -16,7 +16,7 @@ namespace OpenAAP.Services.PasswordHashing
         /// USE THIS IN PRODUCTION
         /// </summary>
         /// <code>
-        /// PBKDF2(password, salt, HMACSHA256, iterationCount: 65536, outputLength: 32)
+        /// PBKDF2(password, salt, HMACSHA256, iterationCount: 1024, outputLength: 32)
         /// </code>
         PBKDF2
     }

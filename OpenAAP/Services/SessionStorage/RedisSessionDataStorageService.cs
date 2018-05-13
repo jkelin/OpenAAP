@@ -30,7 +30,14 @@ namespace OpenAAP.Services.SessionDataStorage
         {
             var data = await redis.StringGetAsync(SessionKey(sessionId));
 
-            return JsonConvert.DeserializeObject<ISession>(data.ToString());
+            if (data.HasValue)
+            {
+                return JsonConvert.DeserializeObject<Session>(data.ToString());
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public async Task StoreSession(Guid sessionId, ISession session)
