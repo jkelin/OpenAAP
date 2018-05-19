@@ -41,6 +41,23 @@ namespace OpenAAP.Controllers
             }
         }
 
+        [HttpPut("{sessionId}/data")]
+        [ProducesResponseType(200, Type = typeof(ISession))]
+        [ProducesResponseType(401)]
+        public async Task<IActionResult> UpdateSessionData(Guid sessionId, [FromBody]object data)
+        {
+            var session = await sessionSvc.UpdateSession(sessionId, data);
+
+            if (session != null)
+            {
+                return Ok(session);
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
         [HttpDelete("{sessionId}")]
         [ProducesResponseType(401)]
         public async Task<IActionResult> DeleteSession(Guid sessionId)

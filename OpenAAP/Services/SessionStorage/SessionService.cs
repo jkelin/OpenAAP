@@ -55,6 +55,20 @@ namespace OpenAAP.Services.SessionStorage
             return session;
         }
 
+        public async Task<ISession> UpdateSession(Guid sessionId, object data)
+        {
+            var session = await LookupBySessionId(sessionId);
+            if(session == null)
+            {
+                return null;
+            }
+
+            session.Data = data;
+
+            await storage.StoreSession(sessionId, session);
+            return session;
+        }
+
         public async Task DeleteSessionsForIdentity(Guid identityId)
         {
             var identity = await context.Identities.Include(x => x.Sessions).FirstOrDefaultAsync(x => x.Id == identityId);
