@@ -5,8 +5,8 @@ using OpenAAP.Context;
 using OpenAAP.Errors;
 using OpenAAP.Options;
 using OpenAAP.Requests;
+using OpenAAP.Responses;
 using OpenAAP.Services.PasswordHashing;
-using OpenAAP.Services.SessionStorage;
 using ProtoBuf;
 using System;
 using System.Collections.Generic;
@@ -21,28 +21,22 @@ namespace OpenAAP.Controllers
     public class PasswordAuthenticationController : Controller
     {
         private readonly OpenAAPContext ctx;
-        private readonly SessionService session;
         private readonly PasswordHashingService hasher;
         private readonly IOptions<HashingOptions> hashingOptions;
-        private readonly IOptions<SessionOptions> sessionOptions;
 
         public PasswordAuthenticationController(
             OpenAAPContext context,
-            SessionService session,
             PasswordHashingService hasher,
-            IOptions<HashingOptions> hashingOptions,
-            IOptions<SessionOptions> sessionOptions
+            IOptions<HashingOptions> hashingOptions
         )
         {
             ctx = context;
-            this.session = session;
             this.hasher = hasher;
             this.hashingOptions = hashingOptions;
-            this.sessionOptions = sessionOptions;
         }
 
         [HttpPost("login")]
-        [ProducesResponseType(200, Type = typeof(ISession))]
+        [ProducesResponseType(200, Type = typeof(AuthenticationResponse))]
         [ProducesResponseType(404, Type = typeof(NoPasswordAuthenticationFound))]
         [ProducesResponseType(404, Type = typeof(ActivePasswordAuthenticationNotFound))]
         [ProducesResponseType(401)]
@@ -66,7 +60,7 @@ namespace OpenAAP.Controllers
             {
                 if (await PasswordMatches(req.Password, auth))
                 {
-                    return Ok(await session.CreateSession(identityId));
+                    return Ok(new AuthenticationResponse { IdentityId = auth.IdentityId });
                 }
             }
 
@@ -102,7 +96,7 @@ namespace OpenAAP.Controllers
         }
 
         [HttpPost("register")]
-        [ProducesResponseType(200, Type = typeof(ISession))]
+        [ProducesResponseType(200, Type = typeof(AuthenticationResponse))]
         public async Task<IActionResult> Register(Guid identityId, [FromBody]PasswordRegisterRequest req)
         {
             var hash = await HashPassword(req.Password);
@@ -119,7 +113,7 @@ namespace OpenAAP.Controllers
             await ctx.PasswordAuthentications.AddAsync(auth);
             await ctx.SaveChangesAsync();
 
-            return Ok(await session.CreateSession(identityId));
+            return Ok(new AuthenticationResponse { IdentityId = identityId });
         }
 
         private async Task<StoredPassword> HashPassword(string password)
@@ -138,8 +132,6 @@ namespace OpenAAP.Controllers
             {
                 reg.DisabledAt = DateTime.UtcNow;
             }
-
-            await session.DeleteSessionsForIdentity(identityId);
         }
     }
 }

@@ -6,6 +6,7 @@ using OpenAAP;
 using OpenAAP.Context;
 using OpenAAP.Options;
 using OpenAAP.Requests;
+using OpenAAP.Responses;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -44,7 +45,7 @@ namespace Test.PasswordAuthentication
                 Password = password
             };
 
-            var regResp = await _client.PostJsonAsync<OpenAAP.Context.Session>(
+            var regResp = await _client.PostJsonAsync<AuthenticationResponse>(
                 $"/identity/{Seeder.IdentityNone.Id}/password/register",
                 regData
             );
@@ -54,7 +55,7 @@ namespace Test.PasswordAuthentication
                 Password = password
             };
 
-            var loginResp = await _client.PostJsonAsync<OpenAAP.Context.Session>(
+            var loginResp = await _client.PostJsonAsync<AuthenticationResponse>(
                 $"/identity/{Seeder.IdentityNone.Id}/password/login",
                 loginData
             );

@@ -14,8 +14,6 @@ using OpenAAP.Context;
 using OpenAAP.Helpers;
 using OpenAAP.Options;
 using OpenAAP.Services.PasswordHashing;
-using OpenAAP.Services.SessionDataStorage;
-using OpenAAP.Services.SessionStorage;
 using StackExchange.Redis;
 
 namespace OpenAAP
@@ -33,17 +31,14 @@ namespace OpenAAP
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<HashingOptions>(Configuration.GetSection(HashingOptions.Section));
-            services.Configure<Options.SessionOptions>(Configuration.GetSection(Options.SessionOptions.Section));
             services.Configure<DatabaseOptions>(Configuration.GetSection(DatabaseOptions.Section));
 
             
             services.AddTransient<PasswordHashingService, PasswordHashingService>();
             services.AddTransient<SHA1PasswordHashingService, SHA1PasswordHashingService>();
             services.AddTransient<PBKDF2PasswordHashingService, PBKDF2PasswordHashingService>();
-            services.AddTransient<SessionService, SessionService>();
 
             ConfigureDatabase(services);
-            ConfigureSessionStore(services);
 
             services.AddMvc(options =>
             {
@@ -74,24 +69,6 @@ namespace OpenAAP
                     break;
                 case DatabaseType.Postgres:
                     services.AddDbContext<OpenAAPContext>(opt => opt.UseNpgsql(opts.ConnectionStringPostgres));
-                    break;
-            }
-        }
-
-        void ConfigureSessionStore(IServiceCollection services)
-        {
-            var opts = Configuration.GetSection(Options.SessionOptions.Section).Get<Options.SessionOptions>() ?? new Options.SessionOptions();
-
-            switch (opts.SessionStoreType)
-            {
-                case SessionStoreType.InMemory:
-                    services.AddSingleton<ISessionDataStorage, InMemorySessionDataStorageService>();
-                    break;
-                case SessionStoreType.Redis:
-                    var redis = ConnectionMultiplexer.Connect(opts.ConnectionStringRedis);
-                    services.AddSingleton(_ => redis);
-                    services.AddTransient(_ => redis.GetDatabase());
-                    services.AddTransient<ISessionDataStorage, RedisSessionDataStorageService>();
                     break;
             }
         }

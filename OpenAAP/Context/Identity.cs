@@ -25,8 +25,5 @@ namespace OpenAAP.Context
 
         [JsonIgnore]
         public ICollection<PasswordAuthentication> PasswordAuthentications { get; set; } = new List<PasswordAuthentication>();
-
-        [JsonIgnore]
-        public ICollection<Session> Sessions { get; set; } = new List<Session>();
     }
 }

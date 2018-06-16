@@ -13,8 +13,6 @@ namespace OpenAAP.Context
 
         public DbSet<PasswordAuthentication> PasswordAuthentications { get; set; }
 
-        public DbSet<Session> Sessions { get; set; }
-
         public OpenAAPContext(DbContextOptions<OpenAAPContext> options)
         : base(options)
         { }

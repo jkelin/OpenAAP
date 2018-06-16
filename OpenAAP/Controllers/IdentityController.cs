@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using OpenAAP.Context;
 using OpenAAP.Errors;
 using OpenAAP.Requests;
-using OpenAAP.Services.SessionStorage;
 
 namespace OpenAAP.Controllers
 {
@@ -15,15 +14,12 @@ namespace OpenAAP.Controllers
     public class IdentityController : Controller
     {
         private readonly OpenAAPContext ctx;
-        private readonly SessionService session;
 
         public IdentityController(
-            OpenAAPContext context,
-            SessionService session
+            OpenAAPContext context
         )
         {
             ctx = context;
-            this.session = session;
         }
 
         [HttpGet("all")]
@@ -97,8 +93,6 @@ namespace OpenAAP.Controllers
             {
                 return NotFound(new IdentityNotFound());
             }
-
-            await session.DeleteSessionsForIdentity(id);
 
             ctx.Identities.Remove(identity);
 

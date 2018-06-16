@@ -41,17 +41,6 @@ namespace Test.PasswordAuthentication
         }
 
         [Fact]
-        public async Task TestLogin()
-        {
-            var response = await _client.PostJsonAsync<OpenAAP.Context.Session>(
-                $"/identity/{Seeder.IdentitySingle.Id}/password/login",
-                new { password = "xyz" }
-            );
-
-            response.IdentityId.Should().Be(Seeder.IdentitySingle.Id);
-        }
-
-        [Fact]
         public async Task LoginInvalidPassword()
         {
             var response = await _client.PostAsync(
