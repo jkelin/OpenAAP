@@ -14,7 +14,6 @@ using OpenAAP.Context;
 using OpenAAP.Helpers;
 using OpenAAP.Options;
 using OpenAAP.Services.PasswordHashing;
-using StackExchange.Redis;
 
 namespace OpenAAP
 {
